@@ -47,3 +47,48 @@ export const selectBooksAndDescriptionsQuery = `
   ON 
     b.book_number = bd.book_number;
 `;
+
+// for store, worker and inventory table
+export const selectInventoryFromStore = `
+  SELECT 
+	  s.store_name,
+    s.store_address,
+	  i.book_numbers,
+	  i.street_name inventory_street
+  FROM 
+    public."inventory" i
+  JOIN
+  	public."Store" s
+  ON 
+    i.store_id = s.store_id;
+`;
+
+export const selectInventoryFromStoreId = `
+  SELECT 
+	  s.store_name,
+    s.store_address,
+	  i.book_numbers,
+	  i.street_name AS inventory_street
+  FROM 
+    public."inventory" i
+  JOIN
+  	public."Store" s
+  ON 
+    i.store_id = s.store_id
+  WHERE s.store_id = $1;
+`;
+
+export const selectWorkerFromStoreId = `
+  SELECT 
+	  s.store_name,
+    s.store_address,
+	  w.worker_name
+  FROM 
+    public."worker" w
+  JOIN
+  	public."Store" s
+  ON 
+    w.store_id = s.store_id
+  WHERE 
+    s.store_id = $1;
+`;
