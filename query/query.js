@@ -20,9 +20,18 @@ export const updateBook = `UPDATE "Book"
   SET publisher_name = $1, viewer_id = $2, genre_id = $3, region_id = $4, language_id = $5, store_id = $6, book_name = $7, publication_year = $8, page = $9, liscence_id = $10 
   WHERE book_number = $11`;
 
-export const createBookQuery = `INSERT INTO "Book" 
+// tcl implementation
+export const createBookQuery = `
+  BEGIN;
+  SELECT * FROM "Book";
+  SAVEPOINT before_update;
+  INSERT INTO "Book" 
   (book_number, publisher_name, viewer_id, genre_id, region_id, language_id, store_id, book_name, publication_year, page, liscence_id) 
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+  ROLLBACK TO before_update;
+  COMMIT;
+  SELECT * FROM "Book";
+`;
 
 // for author tables
 export const updateAuthorQuery = `UPDATE "Author"
@@ -92,3 +101,25 @@ export const selectWorkerFromStoreId = `
   WHERE 
     s.store_id = $1;
 `;
+
+
+// for customer table
+export const selectBookBroughtbyCustomerId = `
+  SELECT 
+    b.book_name,
+    o.quantity
+  FROM
+    public."Brought" AS o
+  JOIN 
+      public."Customer" c
+      ON c.customer_num = o.customer_num
+  JOIN 
+      public."Book" b
+      ON o.book_number = b.book_number
+  WHERE 
+      c.customer_num = $1;
+`
+
+export const addBroughtBookQuery = `INSERT INTO "Brought"
+  (book_number, customer_num, date, price, quantity)
+  VALUES ($1, $2, $3, $4, $5);`
